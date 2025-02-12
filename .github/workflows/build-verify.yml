@@ -47,16 +47,6 @@ jobs:
           cd ${{github.workspace}}/webapp
           mvn -B -Pprod -DskipTests package
 
-      - name: Run Integration tests
-        run: |
-          cd ${{github.workspace}}/webapp
-          mvn -Pit test
-          cd ${{github.workspace}}/minions/async
-          mvn -Pit test
-
-      - name: Verify Javadoc completion
-        run: mvn -B javadoc:javadoc
-
       - id: set-environment
         name: Set environment for branch
         run: |
@@ -89,6 +79,50 @@ jobs:
     outputs:
       image-tag: ${{ steps.set-environment.outputs.IMAGE_TAG }}
       package-image: ${{ steps.set-environment.outputs.PACKAGE_IMAGE }}
+
+  integration-tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 for x64
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          architecture: x64
+          cache: maven
+
+      - name: Build Java components
+        run: mvn -B clean install
+
+      - name: Run Integration tests
+        run: |
+          cd ${{github.workspace}}/webapp
+          mvn -Pit test
+          cd ${{github.workspace}}/minions/async
+          mvn -Pit test
+
+  javadoc-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 21 for x64
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          architecture: x64
+          cache: maven
+
+      - name: Build Java components
+        run: mvn -B clean install
+
+      - name: Verify Javadoc completion
+        run: mvn -B javadoc:javadoc
 
   call-package-native:
     needs: build-verify-package
