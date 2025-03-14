@@ -73,7 +73,7 @@ jobs:
           docker run --rm --network microcks-net curlimages/curl:latest \
             curl -X POST http://microcks:8080/graphql/Movie+Graph+API/1.0 \
             -H "Content-Type: application/json" \
-            -d '{"query":"{ allFilms { A New Hope } }"}'
+            -d '{"query":"{ __schema { queryType { fields { name } } } }"}'
 
       - name: Tear Down Microcks services
         if: always()
