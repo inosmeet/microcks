@@ -17,7 +17,13 @@ jobs:
 
       - name: Start Microcks services
         run: |
-          docker run -p 8585:8080 -d --name microcks --rm quay.io/microcks/microcks-uber:latest-native
+          docker network create microcks-net
+          docker run -d --rm \
+          --name microcks \
+          --network microcks-net
+          -p 8585:8080 \
+          quay.io/microcks/microcks-uber:latest-native
+          sleep 10
 
       - name: docker ls
         run: docker network ls
@@ -32,23 +38,25 @@ jobs:
 
       - name: Check Microcks Connectivity
         run: |
-          docker run --rm curlimages/curl:latest curl -v http://microcks:8585/api/health
-          docker run --rm curlimages/curl:latest curl -v http://microcks:8585/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe
+          docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8585/api/health
+          docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8585/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe
 
       - name: Upload API Artifact to Microcks
         run: |
-          docker run --rm curlimages/curl:latest \
+          docker run --rm --network microcks-net curlimages/curl:latest \
             curl -X POST "http://microcks:8585/api/artifact/upload?mainArtifact=true" \
             -H "Authorization: Bearer ${{ env.MICROCKS_TOKEN }}" \
             -F 'file=@./samples/films.graphql' -k
 
       - name: Run API Tests with k6
         run: |
-          docker run --rm -i \
+          docker run --rm -i --network microcks-net \
             -v ${{ github.workspace }}/scripts:/scripts \
             -e BASE_URL="${{ env.BASE_URL }}" \
             grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
 
       - name: Tear Down Microcks services
         if: always()
-        run: docker compose -f ./install/docker-compose/docker-compose.yml down
+        run: |
+          docker stop microcks
+          docker network rm microcks-net
