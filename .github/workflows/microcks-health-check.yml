@@ -25,7 +25,7 @@ jobs:
         run: ./scripts/container-health-check.sh
 
       - name: Check Microcks Connectivity
-        run: docker run --rm --network=microcks_default curlimages/curl:latest curl -v http://microcks:8080/api/health
+        run: docker run --rm --network=docker-compose_default curlimages/curl:latest curl -v http://microcks:8080/api/health
 
       - name: Export Environment Variables
         run: |
@@ -34,7 +34,7 @@ jobs:
 
       - name: Run API Tests with k6
         run: |
-          docker run --rm -i --network=microcks_default \
+          docker run --rm -i --network=docker-compose_default \
             -v ${{ github.workspace }}/scripts:/scripts \
             -e BASE_URL="${{ env.BASE_URL }}" \
             grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
