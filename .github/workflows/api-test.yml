@@ -1,0 +1,51 @@
+name: Test Microcks APIs
+
+on:
+  push:
+    branches:
+      - master
+  schedule:
+    - cron: '0 0 * * 0'
+  workflow_dispatch:
+
+jobs:
+  api-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Start Microcks services
+        run: docker run -p 8585:8080 -d --rm quay.io/microcks/microcks-uber:latest-native
+
+      - name: docker ls
+        run: docker network ls
+
+      - name: Export Environment Variables
+        run: |
+          echo "MICROCKS_TOKEN=whatever" >> $GITHUB_ENV
+          echo "BASE_URL=http://microcks:8585" >> $GITHUB_ENV
+          echo "K6_VERSION=latest" >> $GITHUB_ENV
+
+      - name: Check Microcks Connectivity
+        run: |
+          docker run --rm --network=docker-compose_default curlimages/curl:latest curl -v http://microcks:8585/api/health
+          docker run --rm --network=docker-compose_default curlimages/curl:latest curl -v http://microcks:8585/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe
+
+      - name: Upload API Artifact to Microcks
+        run: |
+          docker run --rm --network=docker-compose_default curlimages/curl:latest \
+            curl -X POST "http://microcks:8585/api/artifact/upload?mainArtifact=true" \
+            -H "Authorization: Bearer ${{ env.MICROCKS_TOKEN }}" \
+            -F 'file=@./samples/films.graphql' -k
+
+      - name: Run API Tests with k6
+        run: |
+          docker run --rm -i --network=docker-compose_default \
+            -v ${{ github.workspace }}/scripts:/scripts \
+            -e BASE_URL="${{ env.BASE_URL }}" \
+            grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
+
+      - name: Tear Down Microcks services
+        if: always()
+        run: docker compose -f ./install/docker-compose/docker-compose.yml down
