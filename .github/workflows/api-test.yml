@@ -37,17 +37,14 @@ jobs:
           echo "BASE_URL=http://microcks:8080" >> $GITHUB_ENV  # 👈 Use port 8080 inside network
           echo "K6_VERSION=latest" >> $GITHUB_ENV
 
-      - name: Check Microcks Connectivity
-        run: |
-          docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8080/api/health  # 👈 Use port 8080
-          docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8080/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe  # 👈 Use port 8080
-
       - name: Upload API Artifact to Microcks
         run: |
-          docker run --rm --network microcks-net curlimages/curl:latest \
+          docker run --rm --network microcks-net \
+            -v ${{ github.workspace }}/samples:/samples \
+            curlimages/curl:latest \
             curl -X POST "http://microcks:8080/api/artifact/upload?mainArtifact=true" \
             -H "Authorization: Bearer ${{ env.MICROCKS_TOKEN }}" \
-            -F 'file=@./samples/films.graphql' -k
+            -F 'file=@/samples/films.graphql' -k
 
       - name: Run API Tests with k6
         run: |
@@ -55,6 +52,11 @@ jobs:
             -v ${{ github.workspace }}/scripts:/scripts \
             -e BASE_URL="${{ env.BASE_URL }}" \
             grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
+
+      - name: Check Microcks Connectivity
+        run: |
+          docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8080/api/health  # 👈 Use port 8080
+          docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8080/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe  # 👈 Use port 8080
 
       - name: Tear Down Microcks services
         if: always()
