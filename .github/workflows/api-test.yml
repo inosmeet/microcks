@@ -16,10 +16,13 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Start Microcks services
-        run: docker run -p 8585:8080 -d --name microcks --rm quay.io/microcks/microcks-uber:latest-native
+        run: |
+          docker run -p 8585:8080 -d --name microcks --rm quay.io/microcks/microcks-uber:latest-native
 
       - name: docker ls
         run: docker network ls
+      - name: docker ps
+        run: docker ps
 
       - name: Export Environment Variables
         run: |
