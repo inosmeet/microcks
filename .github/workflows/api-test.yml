@@ -20,7 +20,7 @@ jobs:
           docker network create microcks-net
           docker run -d --rm \
             --name microcks \
-            --network microcks-net
+            --network microcks-net \
             -p 8585:8080 \
             quay.io/microcks/microcks-uber:latest-native
           sleep 10
