@@ -18,6 +18,9 @@ jobs:
       - name: Debug Microcks Status
         run: docker compose -f ./install/docker-compose/docker-compose.yml ps
 
+      - name: docker ls
+        run: docker network ls
+
       - name: Wait for containers to be healthy
         run: ./scripts/container-health-check.sh
 
