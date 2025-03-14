@@ -70,7 +70,10 @@ jobs:
       - name: Check Microcks Connectivity
         run: |
           docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8080/api/health  # 👈 Use port 8080
-          docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8080/graphql/Movie+Graph+API/1.0
+          docker run --rm --network microcks-net curlimages/curl:latest \
+            curl -X POST http://microcks:8080/graphql/Movie+Graph+API/1.0 \
+            -H "Content-Type: application/json" \
+            -d '{"query":"{ allFilms { A New Hope } }"}'
 
       - name: Tear Down Microcks services
         if: always()
