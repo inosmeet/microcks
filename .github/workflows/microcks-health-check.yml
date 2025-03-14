@@ -25,7 +25,10 @@ jobs:
         run: ./scripts/container-health-check.sh
 
       - name: Check Microcks Connectivity
-        run: docker run --rm --network=docker-compose_default curlimages/curl:latest curl -v http://microcks:8080/api/health
+        run: |
+          docker run --rm --network=docker-compose_default curlimages/curl:latest curl -v http://microcks:8080/api/health
+          docker run --rm --network=docker-compose_default curlimages/curl:latest curl -v http://microcks:8080/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe
+
 
       - name: Export Environment Variables
         run: |
