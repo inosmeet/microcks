@@ -21,7 +21,7 @@ jobs:
 
       - name: Export Environment Variables
         run: |
-          echo "BASE_URL=http://host.docker.internal:8080" >> $GITHUB_ENV
+          echo "BASE_URL=http://localhost:8080" >> $GITHUB_ENV
           echo "K6_VERSION=latest" >> $GITHUB_ENV
 
       - name: Run API Tests with k6
