@@ -13,20 +13,25 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Start Microcks services
-        run: |
-          docker compose -f ./install/docker-compose/docker-compose.yml up -d
+        run: docker compose -f ./install/docker-compose/docker-compose.yml up -d
+
+      - name: Debug Microcks Status
+        run: docker compose -f ./install/docker-compose/docker-compose.yml ps
 
       - name: Wait for containers to be healthy
         run: ./scripts/container-health-check.sh
 
+      - name: Check Microcks Connectivity
+        run: docker run --rm --network=microcks_default curlimages/curl:latest curl -v http://microcks:8080/api/health
+
       - name: Export Environment Variables
         run: |
-          echo "BASE_URL=http://localhost:8080" >> $GITHUB_ENV
+          echo "BASE_URL=http://microcks:8080" >> $GITHUB_ENV
           echo "K6_VERSION=latest" >> $GITHUB_ENV
 
       - name: Run API Tests with k6
         run: |
-          docker run --rm -i \
+          docker run --rm -i --network=microcks_default \
             -v ${{ github.workspace }}/scripts:/scripts \
             -e BASE_URL="${{ env.BASE_URL }}" \
             grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
