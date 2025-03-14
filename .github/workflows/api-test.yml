@@ -16,7 +16,7 @@ jobs:
         uses: actions/checkout@v3
 
       - name: Start Microcks services
-        run: docker run -p 8585:8080 -d --rm quay.io/microcks/microcks-uber:latest-native
+        run: docker run -p 8585:8080 -d --name microcks --rm quay.io/microcks/microcks-uber:latest-native
 
       - name: docker ls
         run: docker network ls
@@ -29,7 +29,6 @@ jobs:
 
       - name: Check Microcks Connectivity
         run: |
-          docker run --rm curlimages/curl:latest curl -v http://localhost:8585/api/health
           docker run --rm curlimages/curl:latest curl -v http://microcks:8585/api/health
           docker run --rm curlimages/curl:latest curl -v http://microcks:8585/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe
 
