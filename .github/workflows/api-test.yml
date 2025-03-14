@@ -21,7 +21,7 @@ jobs:
           docker run -d --rm \
             --name microcks \
             --network microcks-net \
-            --network-alias microcks \  # 👈 Ensure `microcks` resolves inside the network
+            --network-alias microcks \
             -p 8585:8080 \
             quay.io/microcks/microcks-uber:latest-native
           sleep 10
