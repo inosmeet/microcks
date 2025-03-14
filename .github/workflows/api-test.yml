@@ -29,19 +29,19 @@ jobs:
 
       - name: Check Microcks Connectivity
         run: |
-          docker run --rm --network=docker-compose_default curlimages/curl:latest curl -v http://microcks:8585/api/health
-          docker run --rm --network=docker-compose_default curlimages/curl:latest curl -v http://microcks:8585/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe
+          docker run --rm curlimages/curl:latest curl -v http://microcks:8585/api/health
+          docker run --rm curlimages/curl:latest curl -v http://microcks:8585/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe
 
       - name: Upload API Artifact to Microcks
         run: |
-          docker run --rm --network=docker-compose_default curlimages/curl:latest \
+          docker run --rm curlimages/curl:latest \
             curl -X POST "http://microcks:8585/api/artifact/upload?mainArtifact=true" \
             -H "Authorization: Bearer ${{ env.MICROCKS_TOKEN }}" \
             -F 'file=@./samples/films.graphql' -k
 
       - name: Run API Tests with k6
         run: |
-          docker run --rm -i --network=docker-compose_default \
+          docker run --rm -i \
             -v ${{ github.workspace }}/scripts:/scripts \
             -e BASE_URL="${{ env.BASE_URL }}" \
             grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
