@@ -1,0 +1,43 @@
+name: Microcks Health Check
+
+on:
+  schedule:
+    - cron: '0 0 * * 0'
+workflow_dispatch:
+
+jobs:
+  health-check:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Install docker-compose
+        run: |
+          apt-get update && apt-get install -y docker-compose
+
+      - name: Set up Docker Compose
+        run: docker-compose version
+
+      - name: Start Microcks services
+        run: |
+          docker-compose -f ./install/docker-compose/docker-compose.yml up -d
+
+      - name: Wait for containers to be healthy
+        run: ./scripts/container-health-check.sh
+
+      - name: Export Environment Variables
+        run: |
+          echo "BASE_URL=http://host.docker.internal:8080" >> $GITHUB_ENV
+          echo "K6_VERSION=latest" >> $GITHUB_ENV
+
+      - name: Run API Tests with k6
+        run: |
+          docker run --rm -i \
+            -v ${{ github.workspace }}/scripts:/scripts \
+            -e BASE_URL="${{ env.BASE_URL }}" \
+            grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
+
+      - name: Tear Down Microcks services
+        if: always()
+        run: docker-compose -f ./install/docker-compose/docker-compose.yml down
