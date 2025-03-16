@@ -26,33 +26,18 @@ jobs:
             quay.io/microcks/microcks-uber:latest-native
           sleep 10
 
-      - name: docker ls
-        run: docker network ls
-      - name: docker ps
-        run: docker ps
-
       - name: Export Environment Variables
         run: |
           echo "MICROCKS_TOKEN=whatever" >> $GITHUB_ENV
           echo "BASE_URL=http://microcks:8080" >> $GITHUB_ENV
           echo "K6_VERSION=latest" >> $GITHUB_ENV
 
+
       - name: Upload API Artifacts to Microcks
         run: |
-          docker run --rm --network microcks-net -v "${{ github.workspace }}/samples:/samples" curlimages/curl:latest sh -c '
-            curl -X POST "${{ env.BASE_URL }}/api/artifact/upload?mainArtifact=true" \
-              -H "Authorization: Bearer ${{ env.MICROCKS_TOKEN }}" \
-              -F "file=@/samples/films.graphql" -k &&
-            curl -X POST "${{ env.BASE_URL }}/api/artifact/upload?mainArtifact=false" \
-              -H "Authorization: Bearer ${{ env.MICROCKS_TOKEN }}" \
-              -F "file=@/samples/films-postman.json" -k &&
-            curl -X POST "${{ env.BASE_URL }}/api/artifact/upload?mainArtifact=false" \
-              -H "Authorization: Bearer ${{ env.MICROCKS_TOKEN }}" \
-              -F "file=@/samples/films-metadata.yml" -k &&
-            curl -X POST "${{ env.BASE_URL }}/api/artifact/upload?mainArtifact=true" \
-              -H "Authorization: Bearer ${{ env.MICROCKS_TOKEN }}" \
-              -F "file=@/samples/APIPastry-openapi.yaml" -k
-          '
+          chmod +x scripts/upload_artifacts.sh
+          docker run --rm --network microcks-net -v "${{ github.workspace }}/samples:/samples" \
+            -v "${{ github.workspace }}/scripts:/scripts" curlimages/curl:latest sh -c "/scripts/upload_artifacts.sh"
 
       - name: Run API Tests with k6
         run: |
@@ -60,14 +45,6 @@ jobs:
             -v ${{ github.workspace }}/scripts:/scripts \
             -e BASE_URL="${{ env.BASE_URL }}" \
             grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
-
-      - name: Check Microcks Connectivity
-        run: |
-          docker run --rm --network microcks-net curlimages/curl:latest curl -v http://microcks:8080/api/health  # 👈 Use port 8080
-          docker run --rm --network microcks-net curlimages/curl:latest \
-            curl -X POST http://microcks:8080/graphql/Movie+Graph+API/1.0 \
-            -H "Content-Type: application/json" \
-            -d '{"query":"{ __schema { queryType { fields { name } } } }"}'
 
       - name: Tear Down Microcks services
         if: always()

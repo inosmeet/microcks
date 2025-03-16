@@ -139,7 +139,7 @@ export function invokeSOAPMocks() {
             </soapenv:Body>
         </soapenv:Envelope>`;
         const karlaHeaders = {
-            'Content-Type': 'application/soap+xml; charset=utf-8; action=sayHello'
+            'Content-Type': 'text/xml; charset=utf-8; action=sayHello'
         };
         let karlaCall = http.post(`${BASE_URL}/soap/HelloService+Mock/0.9`, karlaBody, { headers: karlaHeaders });
         check(karlaCall, {
