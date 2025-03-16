@@ -171,7 +171,7 @@ export function invokeSOAPMocks() {
 
 // The default function runs all tests in sequence
 export default function () {
-    // invokeRESTMocks();
+    invokeRESTMocks();
     invokeGraphQLMocks();
     // invokeSOAPMocks();
     sleep(2); // pause between iterations
