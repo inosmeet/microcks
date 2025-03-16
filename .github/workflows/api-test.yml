@@ -43,6 +43,8 @@ jobs:
           docker run --rm --network microcks-net \
             -v "${{ github.workspace }}/samples:/samples" \
             -v "${{ github.workspace }}/scripts:/scripts" \
+            -e BASE_URL="${{ env.BASE_URL }}" \
+            -e MICROCKS_TOKEN="${{ env.MICROCKS_TOKEN }}" \
             curlimages/curl:latest sh /scripts/upload_artifacts.sh
 
       - name: Run API Tests with k6
