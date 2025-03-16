@@ -40,9 +40,10 @@ jobs:
 
       - name: Upload API Artifacts to Microcks
         run: |
-          chmod +x scripts/upload_artifacts.sh
-          docker run --rm --network microcks-net -v "${{ github.workspace }}/samples:/samples" \
-            -v "${{ github.workspace }}/scripts:/scripts" curlimages/curl:latest sh -c "/scripts/upload_artifacts.sh"
+          docker run --rm --network microcks-net \
+            -v "${{ github.workspace }}/samples:/samples" \
+            -v "${{ github.workspace }}/scripts:/scripts" \
+            curlimages/curl:latest sh /scripts/upload_artifacts.sh
 
       - name: Run API Tests with k6
         run: |
