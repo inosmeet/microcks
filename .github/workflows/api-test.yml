@@ -32,6 +32,11 @@ jobs:
           echo "BASE_URL=http://microcks:8080" >> $GITHUB_ENV
           echo "K6_VERSION=latest" >> $GITHUB_ENV
 
+      - name: Debug Check inside the container
+        run: |
+          docker run --rm --network microcks-net \
+            -v "${{ github.workspace }}/scripts:/scripts" \
+            curlimages/curl:latest sh -c "ls -lah /scripts && cat /scripts/upload_artifacts.sh"
 
       - name: Upload API Artifacts to Microcks
         run: |
