@@ -29,7 +29,7 @@ jobs:
 
       - name: Upload API Artifacts to Microcks
         run: |
-          docker run --rm \
+          docker run --rm --add-host=host.docker.internal:host-gateway \
             -v "${{ github.workspace }}/samples:/samples" \
             -v "${{ github.workspace }}/scripts:/scripts" \
             -e BASE_URL="${{ env.BASE_URL }}" \
@@ -38,7 +38,7 @@ jobs:
 
       - name: Run API Tests with k6
         run: |
-          docker run --rm -i \
+          docker run --rm -i --add-host=host.docker.internal:host-gateway \
             -v ${{ github.workspace }}/scripts:/scripts \
             -e BASE_URL="${{ env.BASE_URL }}" \
             grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
