@@ -14,11 +14,8 @@ jobs:
 
       - name: Start Microcks services
         run: |
-          docker network create microcks-net
           docker run -d --rm \
             --name microcks \
-            --network microcks-net \
-            --network-alias microcks \
             -p 8585:8080 \
             quay.io/microcks/microcks-uber:1.11.1
           sleep 10
@@ -31,7 +28,7 @@ jobs:
 
       - name: Upload API Artifacts to Microcks
         run: |
-          docker run --rm --network microcks-net \
+          docker run --rm \
             -v "${{ github.workspace }}/samples:/samples" \
             -v "${{ github.workspace }}/scripts:/scripts" \
             -e BASE_URL="${{ env.BASE_URL }}" \
@@ -40,7 +37,7 @@ jobs:
 
       - name: Run API Tests with k6
         run: |
-          docker run --rm -i --network microcks-net \
+          docker run --rm -i \
             -v ${{ github.workspace }}/scripts:/scripts \
             -e BASE_URL="${{ env.BASE_URL }}" \
             grafana/k6:${{ env.K6_VERSION }} run /scripts/api-tests.js
@@ -49,4 +46,3 @@ jobs:
         if: always()
         run: |
           docker stop microcks
-          docker network rm microcks-net
