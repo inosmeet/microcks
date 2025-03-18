@@ -23,7 +23,7 @@ jobs:
       - name: Export Environment Variables
         run: |
           echo "MICROCKS_TOKEN=whatever" >> $GITHUB_ENV
-          echo "BASE_URL=http://microcks:8080" >> $GITHUB_ENV
+          echo "BASE_URL=http://localhost:8080" >> $GITHUB_ENV
           echo "K6_VERSION=latest" >> $GITHUB_ENV
 
       - name: Upload API Artifacts to Microcks
