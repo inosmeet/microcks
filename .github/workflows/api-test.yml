@@ -15,6 +15,7 @@ jobs:
       - name: Start Microcks services
         run: |
           docker run -d --rm \
+            --add-host=host.docker.internal:host-gateway \
             --name microcks \
             -p 8585:8080 \
             quay.io/microcks/microcks-uber:1.11.1
@@ -23,7 +24,7 @@ jobs:
       - name: Export Environment Variables
         run: |
           echo "MICROCKS_TOKEN=whatever" >> $GITHUB_ENV
-          echo "BASE_URL=http://localhost:8585" >> $GITHUB_ENV
+          echo "BASE_URL=http://host.docker.internal:8585" >> $GITHUB_ENV
           echo "K6_VERSION=latest" >> $GITHUB_ENV
 
       - name: Upload API Artifacts to Microcks
