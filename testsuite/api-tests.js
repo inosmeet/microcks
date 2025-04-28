@@ -1,14 +1,17 @@
-import { browse, invokeRESTMocks, invokeGraphQLMocks, invokeSOAPMocks, invokeGRPCMocks, invokeREST_HelloAPIMocks, invokeREST_PetStoreAPI  } from './commons.js';
+import * as tests from './commons.js';
+import { flavorConfig } from './flavorConfig.js';
 import { sleep } from 'k6';
 
-// The default function runs all tests in sequence
+const FLAVOR = __ENV.FLAVOR || 'uber';
+
 export default function () {
-    invokeRESTMocks();
-    invokeGraphQLMocks();
-    invokeSOAPMocks();
-    browse();
-    invokeGRPCMocks();
-    invokeREST_HelloAPIMocks();
-    invokeREST_PetStoreAPI();
-    sleep(2);
+  const toRun = flavorConfig[FLAVOR];
+  if (!toRun) {
+    console.error(`Unknown flavor "${FLAVOR}"`);
+    return;
+  }
+  for (const fn of toRun) {
+    console.log(`${fn}`);
+    tests[fn]();
+  }
 }
