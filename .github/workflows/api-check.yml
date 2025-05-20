@@ -49,6 +49,21 @@ jobs:
           # We're already cd'ed into install/<method>-compose by the installer
           ./testsuite/check-health.sh --method docker
 
+      - name: Upload API artifacts to Microcks
+        run: |
+          BASE_URL=http://host.docker.internal:8080 \
+          MICROCKS_TOKEN=microcks \
+          ./testsuite/upload-artifacts.sh
+
+      - name: Upload API Artifacts to Microcks
+        run: |
+          docker run --rm --network microcks \
+            -v "${{ github.workspace }}/samples:/samples" \
+            -v "${{ github.workspace }}/scripts:/scripts" \
+            -e BASE_URL="${{ env.BASE_URL }}" \
+            -e MICROCKS_TOKEN="${{ env.MICROCKS_TOKEN }}" \
+            curlimages/curl:latest sh /scripts/upload_artifacts.sh
+
       - name: Run API tests for ${{ matrix.flavor }}
         env:
           FLAVOR: ${{ matrix.flavor }}
