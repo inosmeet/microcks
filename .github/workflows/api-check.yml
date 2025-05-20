@@ -25,7 +25,7 @@ jobs:
 
       - name: Set up dependencies for ${{ matrix.flavor }}
         run: |
-        run: |
+          docker network create microcks
           case "${{ matrix.flavor }}" in
             regular-auth)
               ./testsuite/install-compose.sh --method docker --mode default
