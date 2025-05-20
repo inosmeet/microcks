@@ -53,6 +53,7 @@ jobs:
           PORT: 8585
         run: |
           docker run --rm \
+            --network microcks
             -e FLAVOR=$FLAVOR \
             -e HOST=$HOST \
             -e PORT=$PORT \
