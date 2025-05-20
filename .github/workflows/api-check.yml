@@ -49,7 +49,7 @@ jobs:
           HOST: microcks
           PORT: 8585
         run: |
-          docker run --rm --network microcks \
+          docker run --rm \
             -e FLAVOR=$FLAVOR \
             -e HOST=$HOST \
             -e PORT=$PORT \
