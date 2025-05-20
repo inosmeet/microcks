@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        flavor: [uber-jvm]
+        flavor: [regular-auth]
       fail-fast: false
 
     steps:
@@ -25,26 +25,24 @@ jobs:
 
       - name: Set up dependencies for ${{ matrix.flavor }}
         run: |
-          docker network create microcks
-          docker run -d --network microcks --name microcks -p 8585:8080 --rm quay.io/microcks/microcks-uber:nightly
-        # run: |
-        #   case "${{ matrix.flavor }}" in
-        #     regular-auth)
-        #       ./testsuite/install-compose.sh --method docker --mode default
-        #       ;;
-        #     regular-noauth)
-        #       ./testsuite/install-compose.sh --method docker --mode devmode
-        #       ;;
-        #     uber-jvm)
-        #       ./testsuite/install-microcks.sh --image microcks-uber --tag nightly
-        #       ;;
-        #     uber-native)
-        #       ./testsuite/install-microcks.sh --image microcks-uber --tag nightly-native
-        #       ;;
-        #     *)
-        #       echo "Unknown flavor setup" && exit 1
-        #       ;;
-        #   esac
+        run: |
+          case "${{ matrix.flavor }}" in
+            regular-auth)
+              ./testsuite/install-compose.sh --method docker --mode default
+              ;;
+            regular-noauth)
+              ./testsuite/install-compose.sh --method docker --mode devmode
+              ;;
+            uber-jvm)
+              ./testsuite/install-microcks.sh --image microcks-uber --tag nightly
+              ;;
+            uber-native)
+              ./testsuite/install-microcks.sh --image microcks-uber --tag nightly-native
+              ;;
+            *)
+              echo "Unknown flavor setup" && exit 1
+              ;;
+          esac
 
       - name: Health‑check containers
         run: |
