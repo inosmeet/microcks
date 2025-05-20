@@ -47,9 +47,13 @@ jobs:
         env:
           FLAVOR: ${{ matrix.flavor }}
         run: |
-          echo "Running tests for flavor: $FLAVOR"
+          NETWORK_NAME=$(docker network ls --filter name=_default --format "{{.Name}}" | head -n1)
+          echo "Running tests in Docker network: $NETWORK_NAME"
           docker run --rm \
+            --network "$NETWORK_NAME" \
             -e FLAVOR=$FLAVOR \
+            -e HOST=microcks \
+            -e PORT=8080 \
             -v "$PWD:/scripts" \
             -w /scripts/testsuite \
             grafana/k6:latest \
