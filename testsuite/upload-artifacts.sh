@@ -22,28 +22,28 @@ upload_file() {
 }
 
 # Hello REST API Soapui
-upload_file "./samples/HelloAPI-soapui-project.xml" true
+upload_file "/samples/HelloAPI-soapui-project.xml" true
 
 # Hello Service gRPC
 upload_file "/samples/hello-v1.proto" true
-upload_file "samples/HelloService.postman.json" false
-upload_file "samples/HelloService.metadata.yml" false
+upload_file "/samples/HelloService.postman.json" false
+upload_file "/samples/HelloService.metadata.yml" false
 
 # HelloService Soapui API
-upload_file "samples/HelloService-soapui-project.xml" true
+upload_file "/samples/HelloService-soapui-project.xml" true
 
 # Petstore API
 upload_file "/samples/PetstoreAPI-collection.json" true
 
 # User SignedUp API
-upload_file "samples/UserSignedUpAPI-asyncapi.yml" true
+upload_file "/samples/UserSignedUpAPI-asyncapi.yml" true
 
 # GraphQL API
-upload_file "./samples/films.graphql" true
-upload_file "./samples/films-postman.json" false
-upload_file "./samples/films-metadata.yml" false
+upload_file "/samples/films.graphql" true
+upload_file "/samples/films-postman.json" false
+upload_file "/samples/films-metadata.yml" false
 
 # REST API
-upload_file "./samples/APIPastry-openapi.yaml" true
+upload_file "/samples/APIPastry-openapi.yaml" true
 
 echo "All files uploaded successfully!"
