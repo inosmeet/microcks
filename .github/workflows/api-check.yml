@@ -1,0 +1,61 @@
+name: API Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 4 * * *'
+
+jobs:
+  run-api-tests:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        flavor: [regular-auth, regular-noauth, uber-jvm, uber-native]
+      fail-fast: false
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Install docker-compose
+        run: |
+          sudo apt-get update && sudo apt-get install -y docker-compose
+
+      - name: Set up dependencies for ${{ matrix.flavor }}
+        run: |
+          case "${{ matrix.flavor }}" in
+            regular-auth)
+              ./testsuite/install-compose.sh --method docker --mode default
+              ;;
+            regular-noauth)
+              ./testsuite/install-compose.sh --method docker --mode devmode
+              ;;
+            uber-jvm)
+              ./testsuite/install-microcks.sh --image microcks-uber --tag nightly
+              ;;
+            uber-native)
+              ./testsuite/install-microcks.sh --image microcks-uber --tag nightly-native
+              ;;
+            *)
+              echo "Unknown flavor setup" && exit 1
+              ;;
+          esac
+
+      - name: Run API tests for ${{ matrix.flavor }}
+        env:
+          FLAVOR: ${{ matrix.flavor }}
+        run: |
+          echo "Running tests for flavor: $FLAVOR"
+          docker run --rm \
+            -v "$PWD:/testsuite" \
+            -w /testsuite \
+            loadimpact/k6:latest \
+            run api-tests.js
+
+      - name: Teardown all containers after tests
+        if: always()
+        run: |
+          echo "Cleaning up all Docker containers..."
+          docker ps -q | xargs -r docker stop
+          docker ps -aq | xargs -r docker rm -f
