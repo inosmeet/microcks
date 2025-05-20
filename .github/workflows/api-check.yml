@@ -25,7 +25,6 @@ jobs:
 
       - name: Set up dependencies for ${{ matrix.flavor }}
         run: |
-          docker network create microcks
           case "${{ matrix.flavor }}" in
             regular-auth)
               ./testsuite/install-compose.sh --method docker --mode default
@@ -51,10 +50,10 @@ jobs:
 
       - name: Upload API artifacts to Microcks
         run: |
-          docker run --rm --network microcks \
+          docker run --rm --add-host=host.docker.internal:host-gateway \
             -v "${{ github.workspace }}/samples:/samples" \
             -v "${{ github.workspace }}/testsuite:/scripts" \
-            -e BASE_URL="http://microcks:8080" \
+            -e BASE_URL="http://host.docker.internal:8585" \
             -e MICROCKS_TOKEN="microcks" \
             curlimages/curl:latest sh /scripts/upload-artifacts.sh
 
