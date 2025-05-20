@@ -26,7 +26,7 @@ jobs:
       - name: Set up dependencies for ${{ matrix.flavor }}
         run: |
           docker network create microcks
-          docker run --network microcks -p 8585:8080 --rm quay.io/microcks/microcks-uber:nightly
+          docker run -d --network microcks --name microcks -p 8585:8080 --rm quay.io/microcks/microcks-uber:nightly
         # run: |
         #   case "${{ matrix.flavor }}" in
         #     regular-auth)
