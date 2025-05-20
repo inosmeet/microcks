@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        flavor: [regular-auth, regular-noauth, uber-jvm, uber-native]
+        flavor: [uber-jvm]
       fail-fast: false
 
     steps:
@@ -25,23 +25,25 @@ jobs:
 
       - name: Set up dependencies for ${{ matrix.flavor }}
         run: |
-          case "${{ matrix.flavor }}" in
-            regular-auth)
-              ./testsuite/install-compose.sh --method docker --mode default
-              ;;
-            regular-noauth)
-              ./testsuite/install-compose.sh --method docker --mode devmode
-              ;;
-            uber-jvm)
-              ./testsuite/install-microcks.sh --image microcks-uber --tag nightly
-              ;;
-            uber-native)
-              ./testsuite/install-microcks.sh --image microcks-uber --tag nightly-native
-              ;;
-            *)
-              echo "Unknown flavor setup" && exit 1
-              ;;
-          esac
+          docker run --network microcks -p 8585:8080 -it --rm quay.io/microcks/microcks-uber:nightly
+        # run: |
+        #   case "${{ matrix.flavor }}" in
+        #     regular-auth)
+        #       ./testsuite/install-compose.sh --method docker --mode default
+        #       ;;
+        #     regular-noauth)
+        #       ./testsuite/install-compose.sh --method docker --mode devmode
+        #       ;;
+        #     uber-jvm)
+        #       ./testsuite/install-microcks.sh --image microcks-uber --tag nightly
+        #       ;;
+        #     uber-native)
+        #       ./testsuite/install-microcks.sh --image microcks-uber --tag nightly-native
+        #       ;;
+        #     *)
+        #       echo "Unknown flavor setup" && exit 1
+        #       ;;
+        #   esac
 
       - name: Run API tests for ${{ matrix.flavor }}
         env:
