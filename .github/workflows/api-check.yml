@@ -52,12 +52,13 @@ jobs:
       - name: Run API tests for ${{ matrix.flavor }}
         env:
           FLAVOR: ${{ matrix.flavor }}
-          HOST: microcks
+          HOST: host.docker.internal
           PORT: 8080
-          KEYCLOAK_URL: http://keycloak:8080
+          KEYCLOAK_URL: http://host.docker.internal:18080
         run: |
           docker run --rm \
             --network microcks \
+            --add-host=host.docker.internal:host-gateway \
             -e FLAVOR=$FLAVOR \
             -e HOST=$HOST \
             -e PORT=$PORT \
