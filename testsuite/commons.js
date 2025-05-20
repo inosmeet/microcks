@@ -294,7 +294,7 @@ export function invokeREST_PetStoreAPI() {
 }
 
 export function authenticate() {
-  const url = 'http://localhost:18080/realms/microcks/protocol/openid-connect/token';
+  const url = `${KEYCLOAK_URL}/realms/microcks/protocol/openid-connect/token`;
   const authHeader = 'Basic bWljcm9ja3Mtc2VydmljZWFjY291bnQ6YWI1NGQzMjktZTQzNS00MWFlLWE5MDAtZWM2YjNmZTE1YzU0Cg=';
 
   const headers = {

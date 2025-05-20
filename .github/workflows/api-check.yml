@@ -54,12 +54,14 @@ jobs:
           FLAVOR: ${{ matrix.flavor }}
           HOST: microcks
           PORT: 8080
+          KEYCLOAK_URL: http://keycloak:8080
         run: |
           docker run --rm \
             --network microcks \
             -e FLAVOR=$FLAVOR \
             -e HOST=$HOST \
             -e PORT=$PORT \
+            -e KEYCLOAK_URL=$KEYCLOAK_URL \
             -v "$PWD:/scripts" \
             -w /scripts/testsuite \
             grafana/k6:latest \
