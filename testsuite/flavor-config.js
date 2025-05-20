@@ -16,3 +16,4 @@ var flavorConfig = {
   ),
   // add more flavors as needed…
 };
+export { flavorConfig };
