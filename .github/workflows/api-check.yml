@@ -46,14 +46,11 @@ jobs:
         #       ;;
         #   esac
 
-      - name: Wait for Microcks to be ready
+      - name: Health‑check containers
         run: |
-          echo "Waiting for Microcks to be ready on port 8080..."
-          until curl -s http://microcks:8080/api/features/config > /dev/null; do
-            echo "Waiting for Microcks service..."
-            sleep 5
-          done
-          echo "Microcks is ready!"
+          # We're already cd'ed into install/<method>-compose by the installer
+          ./testsuite/check-health.sh --method docker
+
       - name: Run API tests for ${{ matrix.flavor }}
         env:
           FLAVOR: ${{ matrix.flavor }}
