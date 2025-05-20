@@ -1,5 +1,5 @@
 import * as tests from './commons.js';
-import { flavorConfig } from './flavorConfig.js';
+import { flavorConfig } from './flavor-config.js';
 import { sleep } from 'k6';
 
 const FLAVOR = __ENV.FLAVOR || 'uber';
