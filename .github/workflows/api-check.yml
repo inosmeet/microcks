@@ -65,7 +65,6 @@ jobs:
           KEYCLOAK_URL: http://host.docker.internal:18080
         run: |
           docker run --rm \
-            --network microcks \
             --add-host=host.docker.internal:host-gateway \
             -e FLAVOR=$FLAVOR \
             -e HOST=$HOST \
