@@ -49,8 +49,7 @@ jobs:
           HOST: microcks
           PORT: 8585
         run: |
-          echo "Using network $NETWORK_NAME"
-          docker run --rm \
+          docker run --rm --network microcks \
             -e FLAVOR=$FLAVOR \
             -e HOST=$HOST \
             -e PORT=$PORT \
