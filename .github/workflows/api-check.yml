@@ -2,6 +2,7 @@ name: API Tests
 
 on:
   workflow_dispatch:
+  push:
   schedule:
     - cron: '0 4 * * *'
 
@@ -50,8 +51,8 @@ jobs:
           docker run --rm \
             -v "$PWD:/testsuite" \
             -w /testsuite \
-            loadimpact/k6:latest \
-            run api-tests.js
+            grafana/k6:latest \
+            run /testsuite/api-tests.js
 
       - name: Teardown all containers after tests
         if: always()
