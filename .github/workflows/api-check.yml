@@ -50,7 +50,7 @@ jobs:
         env:
           FLAVOR: ${{ matrix.flavor }}
           HOST: microcks
-          PORT: 8585
+          PORT: 8080
         run: |
           docker run --rm \
             --network microcks \
