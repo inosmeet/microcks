@@ -51,9 +51,12 @@ jobs:
 
       - name: Upload API artifacts to Microcks
         run: |
-          BASE_URL=http://microcks:8080 \
-          MICROCKS_TOKEN=microcks \
-          ./testsuite/upload-artifacts.sh
+          docker run --rm --network microcks \
+            -v "${{ github.workspace }}/samples:/samples" \
+            -v "${{ github.workspace }}/testsuite:/scripts" \
+            -e BASE_URL="http://microcks:8080" \
+            -e MICROCKS_TOKEN="microcks" \
+            curlimages/curl:latest sh /scripts/upload-artifacts.sh
 
       - name: Run API tests for ${{ matrix.flavor }}
         env:
