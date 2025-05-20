@@ -10,6 +10,8 @@ const WAIT_TIME = parseFloat(__ENV.WAIT_TIME) || 0.5;
 const HOST = __ENV.HOST || 'localhost';
 const PORT = __ENV.PORT || '8080';
 const BASE_URL = __ENV.BASE_URL || `http://${HOST}:${PORT}`;
+const GRPC_PORT = __ENV.GRPC_PORT || '9090';
+const KEYCLOAK_URL = __ENV.KEYCLOAK_URL || `http://${HOST}:18080`;
 
 const only500Callback = http.expectedStatuses(500);
 
@@ -183,7 +185,7 @@ export function invokeSOAPMocks() {
 
 // Function to test GRPC endpoints
 export function invokeGRPCMocks() {
-    client.connect(`${HOST}:${PORT}`, { plaintext: true });
+    client.connect(`${HOST}:${GRPC_PORT}`, { plaintext: true });
 
     const payloads = [
         { firstname: 'Laurent', lastname: 'Broudoux' },
@@ -294,7 +296,7 @@ export function invokeREST_PetStoreAPI() {
 }
 
 export function authenticate() {
-  const url = 'http://localhost:18080/realms/microcks/protocol/openid-connect/token';
+  const url = `${KEYCLOAK_URL}/realms/microcks/protocol/openid-connect/token`;
   const authHeader = 'Basic bWljcm9ja3Mtc2VydmljZWFjY291bnQ6YWI1NGQzMjktZTQzNS00MWFlLWE5MDAtZWM2YjNmZTE1YzU0Cg=';
 
   const headers = {
