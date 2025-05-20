@@ -43,24 +43,14 @@ jobs:
               ;;
           esac
 
-      - name: Detect Docker Compose network name
-        id: get-network
-        run: |
-          # Get the current folder name
-          FOLDER_NAME=$(basename "$PWD")
-          NETWORK_NAME="${FOLDER_NAME}_default"
-          echo "NETWORK_NAME=$NETWORK_NAME" >> $GITHUB_ENV
-
       - name: Run API tests for ${{ matrix.flavor }}
         env:
           FLAVOR: ${{ matrix.flavor }}
           HOST: microcks
-          PORT: 8080
-          NETWORK_NAME: ${{ env.NETWORK_NAME }}
+          PORT: 8585
         run: |
           echo "Using network $NETWORK_NAME"
           docker run --rm \
-            --network "$NETWORK_NAME" \
             -e FLAVOR=$FLAVOR \
             -e HOST=$HOST \
             -e PORT=$PORT \
