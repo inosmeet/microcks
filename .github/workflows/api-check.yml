@@ -49,10 +49,10 @@ jobs:
         run: |
           echo "Running tests for flavor: $FLAVOR"
           docker run --rm \
-            -v "$PWD:/testsuite" \
-            -w /testsuite \
+            -v "$PWD:/scripts" \
+            -w /scripts/testsuite \
             grafana/k6:latest \
-            run /testsuite/api-tests.js
+            run api-tests.js
 
       - name: Teardown all containers after tests
         if: always()
