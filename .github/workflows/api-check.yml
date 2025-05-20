@@ -49,6 +49,7 @@ jobs:
         run: |
           echo "Running tests for flavor: $FLAVOR"
           docker run --rm \
+            -e FLAVOR=$FLAVOR \
             -v "$PWD:/scripts" \
             -w /scripts/testsuite \
             grafana/k6:latest \
