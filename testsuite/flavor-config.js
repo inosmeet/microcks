@@ -7,10 +7,12 @@ const baseMocks = [
   'invokeREST_PetStoreAPI',
   'asyncAPI_websocketMocks',
 ]
-export const flavorConfig = {
-  regular-auth: ['ownAPIsAuth', ...baseMocks],
-  regular-noauth: ['ownAPIsNoAuth', ...baseMocks],
-  uber-jvm: ['ownAPIsNoAuth', ...baseMocks],
-  uber-native: ['ownAPIsAuth', ...baseMocks.filter(fn => fn !== 'invokeSOAPMocks')],
+var flavorConfig = {
+  'regular-auth': ['ownAPIsAuth'].concat(baseMocks),
+  'regular-noauth': ['ownAPIsNoAuth'].concat(baseMocks),
+  'uber-jvm': ['ownAPIsNoAuth'].concat(baseMocks),
+  'uber-native': ['ownAPIsAuth'].concat(
+    baseMocks.filter(function (fn) { return fn !== 'invokeSOAPMocks'; })
+  ),
   // add more flavors as needed…
 };
