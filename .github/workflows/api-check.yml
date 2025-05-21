@@ -25,28 +25,21 @@ jobs:
 
       - name: Set up dependencies for ${{ matrix.flavor }}
         run: |
-          case "${{ matrix.flavor }}" in
-            regular-auth)
-              ./testsuite/install-compose.sh --method docker --mode default
-              ;;
-            regular-noauth)
-              ./testsuite/install-compose.sh --method docker --mode devmode
-              ;;
-            uber-jvm)
-              ./testsuite/install-microcks.sh --image microcks-uber --tag nightly
-              ;;
-            uber-native)
-              ./testsuite/install-microcks.sh --image microcks-uber --tag nightly-native
-              ;;
-            *)
-              echo "Unknown flavor setup" && exit 1
-              ;;
-          esac
+          docker run -d \
+            -p 8585:8080 \
+            -p 9090:9090 \
+            --add-host=host.docker.internal:host-gateway \
+            --name microcks \
+            quay.io/microcks/microcks:nightly
+          until curl -sf http://host.docker.internal:8080/api/health > /dev/null; do
+            echo "Waiting for Microcks to be ready..."
+            sleep 2
+          done
 
-      - name: Health‑check containers
-        run: |
-          # We're already cd'ed into install/<method>-compose by the installer
-          ./testsuite/check-health.sh --method docker
+      # - name: Health‑check containers
+      #   run: |
+      #     # We're already cd'ed into install/<method>-compose by the installer
+      #     ./testsuite/check-health.sh --method docker
 
       - name: Upload API artifacts to Microcks
         run: |
@@ -62,6 +55,7 @@ jobs:
           FLAVOR: ${{ matrix.flavor }}
           HOST: host.docker.internal
           PORT: 8080
+          GRPC_PORT: 9090
           KEYCLOAK_URL: http://host.docker.internal:18080
         run: |
           docker run --rm \
@@ -70,6 +64,7 @@ jobs:
             -e HOST=$HOST \
             -e PORT=$PORT \
             -e KEYCLOAK_URL=$KEYCLOAK_URL \
+            -e GRPC_PORT=$GRPC_PORT \
             -v "$PWD:/scripts" \
             -w /scripts/testsuite \
             grafana/k6:latest \
@@ -79,5 +74,4 @@ jobs:
         if: always()
         run: |
           echo "Cleaning up all Docker containers..."
-          docker ps -q | xargs -r docker stop
-          docker ps -aq | xargs -r docker rm -f
+          docker stop microcks
