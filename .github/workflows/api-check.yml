@@ -32,33 +32,36 @@ jobs:
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
             quay.io/microcks/microcks-uber:nightly
-          sleep 30
+          # sleep 30
           docker logs microcks
-          # MAX_RETRIES=15
-          # RETRY_DELAY=10
-          # HEALTH_URL="http://host.docker.internal:8585/api/health"
-          #
-          # for i in $(seq 1 $MAX_RETRIES); do
-          #   HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL")
-          #
-          #   if [ "$HTTP_STATUS" -eq 200 ]; then
-          #     echo "✅ Microcks is healthy! (HTTP $HTTP_STATUS)"
-          #     break
-          #   else
-          #     echo "Waiting for Microcks to be ready... ($i/$MAX_RETRIES, HTTP $HTTP_STATUS)"
-          #     sleep $RETRY_DELAY
-          #   fi
-          #
-          #   if [ "$i" -eq "$MAX_RETRIES" ]; then
-          #     echo "❌ Microcks failed to start in time (last HTTP status: $HTTP_STATUS)."
-          #     docker logs microcks
-          #   fi
-          # done
 
-      # - name: Health‑check containers
-      #   run: |
-      #     # We're already cd'ed into install/<method>-compose by the installer
-      #     ./testsuite/check-health.sh --method docker
+      - name: Health‑check containers
+        env:
+          MAX_RETRIES: 15
+          RETRY_DELAY: 10
+          HEALTH_URL: http://host.docker.internal:8585/api/health
+        run: |
+          MAX_RETRIES=15
+          RETRY_DELAY=10
+          HEALTH_URL="http://host.docker.internal:8585/api/health"
+
+          for i in $(seq 1 $MAX_RETRIES); do
+            HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL")
+
+            if [ "$HTTP_STATUS" -eq 200 ]; then
+              echo "✅ Microcks is healthy! (HTTP $HTTP_STATUS)"
+              break
+            else
+              echo "Waiting for Microcks to be ready... ($i/$MAX_RETRIES, HTTP $HTTP_STATUS)"
+              sleep $RETRY_DELAY
+            fi
+
+            if [ "$i" -eq "$MAX_RETRIES" ]; then
+              echo "❌ Microcks failed to start in time (last HTTP status: $HTTP_STATUS)."
+              docker logs microcks
+            fi
+          done
+
 
       - name: Upload API artifacts to Microcks
         run: |
