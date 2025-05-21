@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        flavor: [uber-native, uber-jvm]
+        flavor: [uber-native, uber-jvm, regular-auth]
       fail-fast: false
 
     steps:
@@ -26,6 +26,10 @@ jobs:
       - name: Set up dependencies for ${{ matrix.flavor }}
         run: |
           case "${{ matrix.flavor }}" in
+            regular-auth)
+              IMAGE="quay.io/microcks/microcks"
+              TAG="nightly"
+              ;;
             uber-jvm)
               IMAGE="quay.io/microcks/microcks-uber"
               TAG="nightly"
