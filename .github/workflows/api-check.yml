@@ -28,6 +28,7 @@ jobs:
           docker run -d \
             -p 8585:8080 \
             -p 9090:9090 \
+            -p 18080:8080 \
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
             quay.io/microcks/microcks:nightly
