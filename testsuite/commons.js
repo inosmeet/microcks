@@ -41,18 +41,22 @@ export function invokeRESTMocks() {
     group('REST API Tests', function () {
         // Test fetching all pastries
         let pastryCall = http.get(`${BASE_URL}/rest/API+Pastry+-+2.0/2.0.0/pastry`);
+        console.error("invokeRESTMocks status:", pastryCall.status);
+
         check(pastryCall, {
             'pastryCall status is 200': (r) => r.status === 200,
         });
 
         // Test fetching a specific pastry in JSON
         let eclairCall = http.get(`${BASE_URL}/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe`);
+        console.error("invokeRESTMocks status:", pastryCall.status);
         check(eclairCall, {
             'eclairCall status is 200': (r) => r.status === 200,
         });
 
         // Test fetching the same pastry in XML
         let eclairXmlCall = http.get(`${BASE_URL}/rest/API+Pastry+-+2.0/2.0.0/pastry/Eclair%20Cafe`, { headers: {'Accept': 'text/xml'} });
+        console.error("invokeRESTMocks status:", pastryCall.status);
         check(eclairXmlCall, {
             'eclairXmlCall status is 200': (r) => r.status === 200,
             'eclairXmlCall response is XML': (r) => r.body.includes("<pastry>"),
@@ -60,6 +64,7 @@ export function invokeRESTMocks() {
 
         // Test fetching another pastry
         let millefeuilleCall = http.get(`${BASE_URL}/rest/API+Pastry+-+2.0/2.0.0/pastry/Millefeuille`);
+        console.error("invokeRESTMocks status:", pastryCall.status);
         check(millefeuilleCall, {
             'millefeuilleCall status is 200': (r) => r.status === 200,
         });
@@ -309,6 +314,7 @@ export function authenticate() {
   };
 
   const response = http.post(url, payload, { headers: headers });
+  console.error("authentication status:", response.status);
 
   check(response, {
       'authentication successful': (r) => r.status === 200,
@@ -357,6 +363,7 @@ export function ownAPIsAuth () {
     const auth_responses = http.batch(
       TESTS.map((t) => ['GET', `${BASE_URL}${t.path}`, null, authHeaders])
     );
+    console.error("ownAPIsAuth status:", auth_responses.status);
 
     TESTS.forEach((t, i) => {
       check(auth_responses[i], {
