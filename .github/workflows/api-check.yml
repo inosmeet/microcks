@@ -41,10 +41,6 @@ jobs:
           RETRY_DELAY: 10
           HEALTH_URL: http://host.docker.internal:8585/api/health
         run: |
-          MAX_RETRIES=15
-          RETRY_DELAY=10
-          HEALTH_URL="http://host.docker.internal:8585/api/health"
-
           for i in $(seq 1 $MAX_RETRIES); do
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" "$HEALTH_URL")
 
