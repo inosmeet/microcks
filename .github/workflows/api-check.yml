@@ -31,10 +31,7 @@ jobs:
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
             quay.io/microcks/microcks:nightly
-          until curl -sf http://host.docker.internal:8080/api/health > /dev/null; do
-            echo "Waiting for Microcks to be ready..."
-            sleep 2
-          done
+          sleep 10
 
       # - name: Health‑check containers
       #   run: |
