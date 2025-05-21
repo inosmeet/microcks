@@ -29,6 +29,7 @@ jobs:
             -p 8585:8080 \
             -p 9090:9090 \
             -p 8180:8080 \
+            -p 8081:8081 \
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
             quay.io/microcks/microcks-uber-async-minion:nightly
