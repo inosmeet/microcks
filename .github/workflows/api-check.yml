@@ -25,7 +25,7 @@ jobs:
 
       - name: Set up dependencies for ${{ matrix.flavor }}
         run: |
-          docker run -d \
+          docker run -d --rm \
             -p 8585:8080 \
             -p 9090:9090 \
             -p 8180:8080 \
