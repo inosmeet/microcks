@@ -28,7 +28,7 @@ jobs:
           docker run -d \
             -p 8585:8080 \
             -p 9090:9090 \
-            -p 18080:8080 \
+            -p 8180:8080 \
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
             quay.io/microcks/microcks:nightly
@@ -75,7 +75,7 @@ jobs:
           HOST: host.docker.internal
           PORT: 8585
           GRPC_PORT: 9090
-          KEYCLOAK_URL: http://host.docker.internal:18080
+          KEYCLOAK_URL: http://host.docker.internal:8180
         run: |
           docker run --rm \
             --add-host=host.docker.internal:host-gateway \
