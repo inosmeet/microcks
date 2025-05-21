@@ -31,12 +31,11 @@ jobs:
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
             quay.io/microcks/microcks:nightly
-          sleep 10
 
-      # - name: Health‑check containers
-      #   run: |
-      #     # We're already cd'ed into install/<method>-compose by the installer
-      #     ./testsuite/check-health.sh --method docker
+      - name: Health‑check containers
+        run: |
+          # We're already cd'ed into install/<method>-compose by the installer
+          ./testsuite/check-health.sh --method docker
 
       - name: Upload API artifacts to Microcks
         run: |
