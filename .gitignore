@@ -22,5 +22,8 @@ target
 hs_err_pid*
 .DS_Store
 *.log
-/.vscode/
 *.iml
+temp_auto_push.bat
+temp_interactive_push.bat
+.gitignore
+branch_structure.json

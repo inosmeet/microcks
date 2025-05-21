@@ -31,7 +31,7 @@ jobs:
             -p 8081:8081 \
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
-            quay.io/microcks/microcks-async-minion:nightly
+            quay.io/microcks/microcks-uber:nightly
           sleep 30
           docker logs microcks
 
