@@ -12,7 +12,7 @@ jobs:
 
     strategy:
       matrix:
-        flavor: [regular-auth]
+        flavor: [regular-noauth]
       fail-fast: false
 
     steps:
@@ -31,7 +31,7 @@ jobs:
             -p 8180:8080 \
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
-            quay.io/microcks/microcks:nightly
+            quay.io/microcks/microcks-uber:nightly
 
           echo "Waiting for Microcks to be healthy..."
 
