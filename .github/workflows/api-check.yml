@@ -31,7 +31,28 @@ jobs:
             --add-host=host.docker.internal:host-gateway \
             --name microcks \
             quay.io/microcks/microcks:nightly
-          sleep 300
+
+          echo "Waiting for Microcks to be healthy..."
+
+          MAX_RETRIES=15
+          RETRY_DELAY=10
+          HEALTH_URL="http://host.docker.internal:8080/api/health"
+
+          for i in $(seq 1 $MAX_RETRIES); do
+            if curl --fail --silent "$HEALTH_URL" > /dev/null; then
+              echo "✅ Microcks is healthy!"
+              break
+            else
+              echo "Waiting for Microcks to be ready... ($i/$MAX_RETRIES)"
+              sleep $RETRY_DELAY
+            fi
+
+            if [[ "$i" -eq "$MAX_RETRIES" ]]; then
+              echo "❌ Microcks failed to start in time."
+              docker logs microcks
+              exit 1
+            fi
+          done
 
       # - name: Health‑check containers
       #   run: |
@@ -43,7 +64,7 @@ jobs:
           docker run --rm --add-host=host.docker.internal:host-gateway \
             -v "${{ github.workspace }}/samples:/samples" \
             -v "${{ github.workspace }}/testsuite:/scripts" \
-            -e BASE_URL="http://host.docker.internal:8080" \
+            -e BASE_URL="http://host.docker.internal:8585" \
             -e MICROCKS_TOKEN="microcks" \
             curlimages/curl:latest sh /scripts/upload-artifacts.sh
 
@@ -51,7 +72,7 @@ jobs:
         env:
           FLAVOR: ${{ matrix.flavor }}
           HOST: host.docker.internal
-          PORT: 8080
+          PORT: 8585
           GRPC_PORT: 9090
           KEYCLOAK_URL: http://host.docker.internal:18080
         run: |
