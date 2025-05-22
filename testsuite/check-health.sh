@@ -82,10 +82,13 @@ else
   echo "Checking Helm in namespace '$NAMESPACE'"
 
   mapfile -t deployments < <(
-    kubectl get deployments \
-      -n "$NAMESPACE" \
-      -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}'
+    kubectl get deployments -n "$NAMESPACE" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}' \
+    | sort -u | grep -v '^microcks-async-minion$'
   )
+  # Append async one at the end if it exists
+  if kubectl get deployment microcks-async-minion -n "$NAMESPACE" &>/dev/null; then
+    deployments+=("microcks-async-minion")
+  fi
 
   if [[ ${#deployments[@]} -eq 0 ]]; then
     echo "Error: No deployments found in namespace '$NAMESPACE'"

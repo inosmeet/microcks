@@ -69,8 +69,17 @@ fi
 
 # Wait for the Microcks pods to become ready.
 echo "[INFO] Waiting for Microcks pods to be ready (timeout: 300s)..."
-if ! kubectl wait --for=condition=Ready pod -n "$NAMESPACE" -l app=microcks --timeout=300s; then
-  echo "[WARN] Microcks pods did not become ready within 300s. Continuing anyway."
+
+# Wait for all microcks pods except async-minion
+pods=$(kubectl get pods -n "$NAMESPACE" -l app=microcks -o jsonpath='{.items[?(@.metadata.name!="microcks-async-minion")].metadata.name}')
+
+if ! kubectl wait --for=condition=Ready pod -n "$NAMESPACE" $pods --timeout=120s; then
+  echo "[WARN] Some Microcks pods (except async-minion) did not become ready within 300s. Continuing anyway."
+fi
+
+# Wait for async-minion pod last
+if ! kubectl wait --for=condition=Ready pod microcks-async-minion -n "$NAMESPACE" --timeout=120s; then
+  echo "[WARN] Async-minion pod did not become ready within 300s. Continuing anyway."
 fi
 
 echo "------------------------------------------------------"
