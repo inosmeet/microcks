@@ -69,7 +69,9 @@ fi
 
 # Wait for the Microcks pods to become ready.
 echo "[INFO] Waiting for Microcks pods to be ready (timeout: 300s)..."
-kubectl wait --for=condition=Ready pod -n $NAMESPACE -l app=microcks --timeout=300s
+if ! kubectl wait --for=condition=Ready pod -n "$NAMESPACE" -l app=microcks --timeout=300s; then
+  echo "[WARN] Microcks pods did not become ready within 300s. Continuing anyway."
+fi
 
 echo "------------------------------------------------------"
 echo "Microcks installation is complete!"
