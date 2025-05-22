@@ -97,10 +97,25 @@ else
 
   for dep in "${deployments[@]}"; do
     echo "Waiting for deployment '$dep' to roll out (timeout: 60s)..."
-    if ! kubectl rollout status deployment/"$dep" \
-         -n "$NAMESPACE" \
-         --timeout=60s; then
-      echo "Deployment '$dep' failed to roll out in 60s"
+    retries=3
+    attempt=1
+    success=false
+    while [[ $attempt -le $retries ]]; do
+      if kubectl rollout status deployment/"$dep" -n "$NAMESPACE" --timeout=60s; then
+        success=true
+        break
+      else
+        echo "Attempt $attempt for deployment '$dep' failed."
+        ((attempt++))
+        if [[ $attempt -le $retries ]]; then
+          echo "Retrying in 5 seconds..."
+          sleep 5
+        fi
+      fi
+    done
+
+    if ! $success; then
+      echo "Deployment '$dep' failed to roll out after $retries attempts."
       unhealthy+=("$dep")
     fi
   done
