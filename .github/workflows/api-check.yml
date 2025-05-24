@@ -128,7 +128,7 @@ jobs:
       - name: Get Microcks access token
         env:
           CLIENT_AUTH: bWljcm9ja3Mtc2VydmljZWFjY291bnQ6YWI1NGQzMjktZTQzNS00MWFlLWE5MDAtZWM2YjNmZTE1YzU0Cg=
-          TOKEN_URL: http://host.docker.internal:18080/realms/microcks/protocol/openid-connect/token
+          TOKEN_URL: http://localhost:18080/realms/microcks/protocol/openid-connect/token
         id: get_token
         run: |
           echo "Fetching access token..."
