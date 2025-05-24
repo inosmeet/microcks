@@ -114,10 +114,10 @@ jobs:
         run: |
           case "${{ matrix.flavor }}" in
             regular-auth)
-              ./testsuite/check-health --method docker --mode default
+              ./testsuite/check-health.sh --method docker --mode default
               ;;
             regular-noauth)
-              ./testsuite/check-health --method docker --mode devmode
+              ./testsuite/check-health.sh --method docker --mode devmode
               ;;
             *)
               echo "Unsupported flavor: ${{ matrix.flavor }}"
