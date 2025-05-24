@@ -414,7 +414,7 @@ export function ownAPIsAuth () {
     const auth_responses = http.batch(
       TESTS.map((t) => ['GET', `${BASE_URL}${t.path}`, null, authHeaders])
     );
-
+    console.log("auth_responses:", auth_responses);
     TESTS.forEach((t, i) => {
       let ok = check(auth_responses[i], {
         [`GET ${t.path} auth returns 200`]: (r) => r.status === 200,
