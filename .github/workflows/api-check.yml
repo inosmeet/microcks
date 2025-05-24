@@ -110,6 +110,21 @@ jobs:
           esac
           sleep 30
 
+      - name: Health‑check containers
+        run: |
+          case "${{ matrix.flavor }}" in
+            regular-auth)
+              ./testsuite/check-health --method docker --mode default
+              ;;
+            regular-noauth)
+              ./testsuite/check-health --method docker --mode devmode
+              ;;
+            *)
+              echo "Unsupported flavor: ${{ matrix.flavor }}"
+              exit 1
+              ;;
+          esac
+
       - name: Upload API artifacts to Microcks
         env:
           MICROCKS_TOKEN: bWljcm9ja3Mtc2VydmljZWFjY291bnQ6YWI1NGQzMjktZTQzNS00MWFlLWE5MDAtZWM2YjNmZTE1YzU0Cg=
