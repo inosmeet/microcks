@@ -125,20 +125,37 @@ jobs:
               ;;
           esac
 
-      - name: Debug Microcks connectivity
+      - name: Get Microcks access token
+        env:
+          CLIENT_AUTH: bWljcm9ja3Mtc2VydmljZWFjY291bnQ6YWI1NGQzMjktZTQzNS00MWFlLWE5MDAtZWM2YjNmZTE1YzU0Cg=
+          TOKEN_URL: https://keycloak.microcks.example.com/realms/microcks/protocol/openid-connect/token
+        id: get_token
         run: |
-          echo "Pinging Microcks..."
-          curl -v http://host.docker.internal:8080/api/health || echo "Connection failed"
+          echo "Fetching access token..."
+          TOKEN_RESPONSE=$(curl -s -X POST "$TOKEN_URL" \
+            -H 'Content-Type: application/x-www-form-urlencoded' \
+            -H 'Accept: application/json' \
+            -H "Authorization: Basic $CLIENT_AUTH" \
+            -d 'grant_type=client_credentials' -k)
+
+          echo "Response: $TOKEN_RESPONSE"
+
+          ACCESS_TOKEN=$(echo "$TOKEN_RESPONSE" | jq -r '.access_token')
+          if [ -z "$ACCESS_TOKEN" ] || [ "$ACCESS_TOKEN" == "null" ]; then
+            echo "ERROR: Failed to get access token"
+            exit 1
+          fi
+          echo "token=$ACCESS_TOKEN" >> $GITHUB_OUTPUT
 
       - name: Upload API artifacts to Microcks
         env:
-          MICROCKS_TOKEN: bWljcm9ja3Mtc2VydmljZWFjY291bnQ6YWI1NGQzMjktZTQzNS00MWFlLWE5MDAtZWM2YjNmZTE1YzU0Cg=
+          BASE_URL: http://host.docker.internal:8080
+          MICROCKS_TOKEN: ${{ steps.get_token.outputs.token }}
         run: |
-          cd $GITHUB_WORKSPACE
           docker run --rm --add-host=host.docker.internal:host-gateway \
             -v "${{ github.workspace }}/samples:/samples" \
             -v "${{ github.workspace }}/testsuite:/scripts" \
-            -e BASE_URL="http://host.docker.internal:8080" \
+            -e BASE_URL="${BASE_URL}" \
             -e MICROCKS_TOKEN="${MICROCKS_TOKEN}" \
             curlimages/curl:latest sh /scripts/upload-artifacts.sh
 
