@@ -16,9 +16,17 @@ upload_file() {
 
   echo "Uploading: $file_path (mainArtifact=$main_artifact)"
 
-  curl -X POST "${BASE_URL}/api/artifact/upload?mainArtifact=${main_artifact}" \
+  curl -v -X POST "${BASE_URL}/api/artifact/upload?mainArtifact=${main_artifact}" \
     -H "Authorization: Bearer ${MICROCKS_TOKEN}" \
     -F "file=@${file_path}" -k
+
+  local curl_exit_code=$?
+  if [[ $curl_exit_code -ne 0 ]]; then
+    echo "ERROR: Upload failed for $file_path with exit code $curl_exit_code"
+    return $curl_exit_code
+  fi
+
+  echo "Upload succeeded for $file_path"
 }
 
 # Hello REST API Soapui
