@@ -125,10 +125,16 @@ jobs:
               ;;
           esac
 
+      - name: Debug Microcks connectivity
+        run: |
+          echo "Pinging Microcks..."
+          curl -v http://host.docker.internal:8080/api/health || echo "Connection failed"
+
       - name: Upload API artifacts to Microcks
         env:
           MICROCKS_TOKEN: bWljcm9ja3Mtc2VydmljZWFjY291bnQ6YWI1NGQzMjktZTQzNS00MWFlLWE5MDAtZWM2YjNmZTE1YzU0Cg=
         run: |
+          cd $GITHUB_WORKSPACE
           docker run --rm --add-host=host.docker.internal:host-gateway \
             -v "${{ github.workspace }}/samples:/samples" \
             -v "${{ github.workspace }}/testsuite:/scripts" \
