@@ -131,6 +131,21 @@ else
     if ! $success; then
       echo "Deployment '$dep' failed to roll out after $retries attempts."
       unhealthy+=("$dep")
+
+      echo "----- Fetching pods for deployment '$dep' -----"
+      pods=$(kubectl get pods -n "$NAMESPACE" -l app="$dep" -o jsonpath='{range .items[*]}{.metadata.name}{"\n"}{end}')
+      if [[ -z "$pods" ]]; then
+        echo "No pods found for deployment '$dep' with label app=$dep. Trying fallback selector..."
+
+        # Fallback: Match by deployment name prefix
+        pods=$(kubectl get pods -n "$NAMESPACE" --no-headers | grep "^$dep" | awk '{print $1}')
+      fi
+
+      for pod in $pods; do
+        echo "----- Logs for pod: $pod -----"
+        kubectl logs "$pod" -n "$NAMESPACE" || echo "Failed to get logs for pod $pod"
+        echo "-------------------------------"
+      done
     fi
   done
 fi
@@ -142,6 +157,14 @@ else
   echo "Some containers failed health checks:"
   for entry in "${unhealthy[@]}"; do
     echo "$entry"
+    cname="${entry%%:*}"
+    if [[ "$METHOD" == "docker" || "$METHOD" == "podman" ]]; then
+      echo "----- Logs for container: $cname -----"
+      $INSPECT_CMD logs "$cname" || echo "Failed to get logs for $cname"
+      echo "--------------------------------------"
+    else
+      echo "To get logs, run: kubectl logs deployment/$cname -n $NAMESPACE"
+    fi
   done
   exit 1
 fi
