@@ -35,7 +35,21 @@ if [[ "$METHOD" == "docker" || "$METHOD" == "podman" ]]; then
 
   to_seconds() {
     local value="$1"
-    echo "${value//[a-zA-Z]/}"
+    local total=0
+    local num unit
+
+    while [[ "$value" =~ ([0-9]+)([hms]) ]]; do
+      num="${BASH_REMATCH[1]}"
+      unit="${BASH_REMATCH[2]}"
+      case "$unit" in
+        h) total=$((total + num * 3600)) ;;
+        m) total=$((total + num * 60)) ;;
+        s) total=$((total + num)) ;;
+      esac
+      value="${value#"$num$unit"}"
+    done
+
+    echo "$total"
   }
 
   containers=($($INSPECT_CMD ps --format '{{.Names}}'))
@@ -56,8 +70,8 @@ if [[ "$METHOD" == "docker" || "$METHOD" == "podman" ]]; then
     echo "Interval=${interval}, timeout=${timeout}, start-period=${start_period}, retries=${retries}"
 
     try=0
-    elapsed=0
-    sleep $start_period
+    elapsed=$(to_seconds "$start_period")
+    sleep "$(to_seconds "$start_period")"
     timeout_val=$(to_seconds "$timeout")
     interval_val=$(to_seconds "$interval")
     while [[ $elapsed -lt $timeout_val ]] || [[ $try -lt $retries ]]; do
@@ -69,7 +83,7 @@ if [[ "$METHOD" == "docker" || "$METHOD" == "podman" ]]; then
         break
       fi
 
-      sleep "$interval"
+      sleep "$interval_val"
       try=$((try + 1))
       elapsed=$((elapsed + interval_val))
     done
