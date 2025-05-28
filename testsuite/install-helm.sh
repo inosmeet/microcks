@@ -53,12 +53,14 @@ helm repo update
 echo "[INFO] Installing Microcks..."
 if $ASYNC; then
   helm install strimzi strimzi/strimzi-kafka-operator --namespace microcks
+
   helm install microcks ./microcks --namespace=microcks \
-      --set appName=microcks --set features.async.enabled=true \
-      --set microcks.url=microcks.${MINIKUBE_IP}.nip.io \
-      --set keycloak.url=keycloak.${MINIKUBE_IP}.nip.io \
-      --set keycloak.privateUrl=http://microcks-keycloak.microcks.svc.cluster.local:8080 \
-      --set features.async.kafka.url=${MINIKUBE_IP}.nip.io
+    --set appName=microcks \
+    --set features.async.enabled=true \
+    --set microcks.url=microcks.${MINIKUBE_IP}.nip.io \
+    --set keycloak.url=keycloak.${MINIKUBE_IP}.nip.io \
+    --set keycloak.privateUrl=http://microcks-keycloak.microcks.svc.cluster.local:8080 \
+    --set features.async.kafka.url=microcks-kafka-kafka-bootstrap.microcks.svc.cluster.local:9092
 else
   helm install microcks ./microcks --namespace microcks \
      --set microcks.url=microcks.${MINIKUBE_IP}.nip.io \
