@@ -70,22 +70,17 @@ if [[ "$METHOD" == "docker" || "$METHOD" == "podman" ]]; then
     echo "Interval=${interval}, timeout=${timeout}, start-period=${start_period}, retries=${retries}"
 
     try=0
-    elapsed=$(to_seconds "$start_period")
     sleep "$(to_seconds "$start_period")"
-    timeout_val=$(to_seconds "$timeout")
-    interval_val=$(to_seconds "$interval")
-    while [[ $elapsed -lt $timeout_val ]] || [[ $try -lt $retries ]]; do
+    while [[ $try -lt $retries ]]; do
       status=$($INSPECT_CMD inspect -f '{{.State.Health.Status}}' "$cname")
-      echo "Status after ${elapsed}s: $status"
 
       if [[ "$status" == "healthy" ]]; then
         echo "$cname is healthy!"
         break
       fi
 
-      sleep "$interval_val"
+      sleep $(to_seconds "$interval")
       try=$((try + 1))
-      elapsed=$((elapsed + interval_val))
     done
 
     if [[ "$status" != "healthy" ]]; then
